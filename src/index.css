@@ -1,0 +1,14 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: serif;
+  font-size: 18px;
+}
+
+* {
+  font-family: serif;
+  box-sizing: border-box !important;
+  font-size: 18px;
+  -webkit-box-sizing: border-box !important;
+  -moz-box-sizing: border-box !important;
+}
