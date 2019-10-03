@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Control, LocalForm, Errors} from 'react-redux-form';
+import { Button } from '../shared/sharedStyles';
 //The form in the ContactComponent is remade using redux-forms. The redux form takes care of 
 //validations and errors as well as events. Hence, lesser code to write.
 
@@ -125,7 +126,7 @@ export const FormInput = {
     outline: 'none',
 }
 
-const MessageInput = {
+export const MessageInput = {
     minHeight: '50px',
     fontSize: '14px',
     borderRadius: '2px',
@@ -134,18 +135,6 @@ const MessageInput = {
     outline: 'none',
 }
 
-export const ButtonStyle = {
-    width: 'fit-content',
-    padding: '10px',
-    color: '#fff',
-    backgroundColor: '#3987d6',
-    border: 'none',
-    borderRadius: '5px',
-    fontSize: '12px',
-    fontWeight: '600',
-    outline: 'none',
-    cursor: 'pointer',
-}
 
 export const FormFeedback = {
     color: 'red',
@@ -362,7 +351,7 @@ class Contact extends Component {
 
                                 <div style={FormRowLast}>
                                     <div style={MessageSection}>
-                                        <button type="submit" style={ButtonStyle}>Send Feedback</button>
+                                        <Button type="submit" >Send Feedback</Button>
                                     </div>
                                 </div>
                             </LocalForm>

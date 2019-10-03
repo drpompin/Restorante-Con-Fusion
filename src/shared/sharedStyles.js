@@ -37,3 +37,16 @@ export const ModalRow = styled.div`
     flex-direction: column;
     margin-bottom: 20px;
 `
+
+export const Button = styled.button`
+    width: fit-content;
+    padding: 10px;
+    color: #fff;
+    background-color: #3987d6;
+    border: none;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+`

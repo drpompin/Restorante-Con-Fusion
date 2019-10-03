@@ -3,8 +3,8 @@ import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import Modal from 'react-responsive-modal';
 import { HeaderStyle } from '../shared/headerComponent';
-import { FormLabel, FormInput, ButtonStyle } from './ContactComponent';
-import { LoginDiv, ModalHeader, FormForm, ModalBody, ModalRow  } from '../shared/sharedStyles';
+import { FormLabel, FormInput } from './ContactComponent';
+import { LoginDiv, ModalHeader, FormForm, ModalBody, ModalRow, Button  } from '../shared/sharedStyles';
 
 class Header extends Component {
 
@@ -31,7 +31,7 @@ class Header extends Component {
 
     handleLogin(e) {
         this.toggleModal();
-
+        console.log('eeeeeeeee', e);
         alert('Username: ' + this.UsernameReference.current.value + 
         'Password: ' + this.PasswordReference.current.value + 
         'Remember: ' + this.InputReference.current.checked);
@@ -187,7 +187,7 @@ class Header extends Component {
                                     />
                             </ModalRow>
 
-                            <button style={ButtonStyle} type="submit" value="submit">Login</button>
+                            <Button type="submit" value="submit">Login</Button>
                         </ModalBody>
                     </FormForm>
                 </Modal>

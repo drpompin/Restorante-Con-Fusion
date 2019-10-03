@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import Modal from 'react-responsive-modal';
-import { FormLabel, FormInput, ButtonStyle, FormFeedback } from './ContactComponent';
-import { ModalHeader, FormForm, ModalBody, ModalRow } from '../shared/sharedStyles';
+import { FormLabel, FormInput, FormFeedback, MessageInput } from './ContactComponent';
+import { ModalHeader, ModalBody, ModalRow, Button } from '../shared/sharedStyles';
+import { Control, LocalForm, Errors } from 'react-redux-form';
 
 
 const leftStyle = {
@@ -49,7 +50,7 @@ const TitleName = {
     
     
 function RenderDish({dish}) {
-    console.log('dish in renderdish', dish);
+    // console.log('dish in renderdish', dish);
         return (
             <div style={leftStyle}>
                 <img src={dish.image} alt={dish.name} style={{ width: '100%'}} />
@@ -61,35 +62,146 @@ function RenderDish({dish}) {
     
 }
 
-function RenderComments({ props, openCommentModal }) {
-        console.log('props in comments', props, openCommentModal);
-        let comments = props.comments || {};
-
+function RenderComments({ comments, addComment, dishId }) {
+        
         return (
             <div style={rightStyle}>
                 <h2 style={{textAlign: 'left', margin: '0'}}>Comments</h2>
                 {
-                    comments === undefined ?
-                        <div></div>
+                    comments !== undefined ?
 
-                        :
-                        
-                        
-                        
                         comments.map((comment, id) => {
                             return (
                                 <div key={id}>
                                     <p style={{ textAlign: 'left' }}>{comment.comment}</p>
 
-                                    <p style={{ textAlign: 'left' }}>--{comment.author}, {comment.date}</p>
+                                    <p style={{ textAlign: 'left' }}>-- {comment.author}, {comment.date}</p>
                                     
                                 </div>
                             );
                         })
+                        :
+                        
+                        <div></div>
+
                 }
-                <button onClick={openCommentModal} style={ButtonStyle}>&#9998; Submit Comment</button>                    
+                <CommentForm 
+                    dishId={dishId}
+                    addComment={addComment}
+                    // toggleCommentModal={this.toggleCommentModal}
+                />
             </div>
         )
+}
+
+const required = (val) => val && val.length;
+
+//maxLength takes len and then val and endures that the length of the value entered in the input box 
+//is less than a certain value
+const maxLength = (len) => (val) => !(val) || (val.length <= len);
+
+//minLength also tests for minimum length
+const minLength = (len) => (val) => (val) && (val.length >= len);
+
+
+class CommentForm extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            openModal: false,
+        }
+
+        this.toggleCommentModal = this.toggleCommentModal.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    toggleCommentModal() {
+        this.setState({
+            openModal: !this.state.openModal,
+        });
+    }
+
+
+    
+    handleSubmit(values) {
+        
+        this.toggleCommentModal();
+        console.log('details in form submit', values);
+        alert('Details in the form' + JSON.stringify(values));
+        //Additon of the toggleCommentModal function which toggles the modal state is to ensure that the
+        //modal closes after submission
+        this.props.addComment(this.props.dishId, values.rating, values.author, values.comment);
+        // event.preventDefault();
+    }
+    
+
+    render() {
+        const { openModal } = this.state;
+
+        return (
+            <div>
+                <Button onClick={this.toggleCommentModal} style={{float: 'left'}}>&#9998; Submit Comment</Button>                    
+
+                {
+                    this.state.openModal === true ?
+                        <Modal open={openModal} onClose={this.toggleCommentModal} center>
+                            <LocalForm onSubmit={(values) => this.handleSubmit(values)}>
+                                <ModalHeader>Submit Comment</ModalHeader>
+                                <ModalBody style={{ width: '400px' }}>
+                                    <ModalRow>
+                                        <i style={FormLabel}>Rating</i>
+                                        <Control.select model=".rating" name="rating" style={FormInput}>
+                                            <option>1</option>
+                                            <option>2</option>
+                                            <option>3</option>
+                                            <option>4</option>
+                                            <option>5</option>
+                                        </Control.select>
+                                    </ModalRow>
+
+                                    <ModalRow>
+                                        <i style={FormLabel}>Your Name</i>
+                                        <Control.text model=".author" id="author" name="author"
+                                            style={FormInput}
+                                            validators={{
+                                                required,
+                                                minLength: minLength(3),
+                                                maxLength: maxLength(15),
+                                            }}
+                                        />
+                                        <Errors
+                                            style={FormFeedback}
+                                            model=".username"
+                                            show="touched"
+                                            //messages below displays the messages that need to be 
+                                            //displayed when the conditions on the left are true
+                                            messages={{
+                                                required: "Required! ",
+                                                minLength: "Must be greater than 2 characters! ",
+                                                maxLength: "Must be 15 characters or less! ",
+                                            }}
+                                        />
+                                    </ModalRow>
+
+                                    <ModalRow>
+                                        <i style={FormLabel}>Comment</i>
+                                        <Control.textarea model=".comment" id="comment" name="comment"
+                                            style={MessageInput} />
+                                    </ModalRow>
+
+
+
+
+
+                                    <Button type="submit" value="submit">Submit</Button>
+                                </ModalBody>
+                            </LocalForm>
+                        </Modal>
+                        : ''
+                }
+            </div>
+        );
+    }
 }
 
 
@@ -98,100 +210,17 @@ function RenderComments({ props, openCommentModal }) {
 
 
 
-
 class DishDetail extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            openModal: false,
-            comment: '',
-            rating: 1,
-            username: '',
-            touched: {
-                username: false,
-            }
-        }
-
-        this.openCommentModal = this.openCommentModal.bind(this);
-        this.handleInputChange = this.handleInputChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-    }
-
-    openCommentModal() {
-        this.setState({
-            openModal: !this.state.openModal,
-        });
-    }
-
-    handleInputChange(event) {
-        const target = event.target;
-        const value = target.type === "checkbox" ? target.checked : target.value;
-        const name = target.name;
-        
-        this.setState({
-            //Array Destructuring is used here, Instead of writing this.state.username: username.value, 
-            //this.state.comment: comment.value .etc., we use array destructuring by using [name] to represent the
-            //selected state and value returns the value
-            [name]: value,
-        })
-    }
-
-
-    //As part of validation, an handleBlur function is defined to indicate particular fields 
-    //that have been modified. The function receives event also
-    handleBlur = (field) => (evt) => {
-        this.setState({
-            //This line below identifies the particular field that has been modified. It looks in the 
-            //entire this.state.touched fields; {thats why we use the all selector ...this.state.touched}, 
-            //it then selects the particular field(input box) from this.state.touched that has been 
-            // modified and sets the state of the field to true
-            touched: { ...this.state.touched, [field]: true },
-        });
-    }
-
-
-    //A validate function is also designed which takes in the field names as parameters
-    validate(username) {
-        // we create an error object containing the initial message of the parameters state which is 
-        //an empty string; and if there is an error, a set error message will be displayed
-        const errors = {
-            username: '',
-        }
-
-        //Below, we define set validations for different fields; taking the state of touched and combining
-        //it with whatever preferences we have for our our fields; error messages are also defined
-        if (this.state.touched.username && username.length < 3)
-            errors.username = "Username should be >= 3 characters";
-        else if (this.state.touched.username && username.length > 20)
-            errors.username = "Username should be <= 20 characters";
-
-        return errors;
-    }
-
-    handleSubmit(event) {
-        alert('Deatils in the form' + JSON.stringify(this.state));
-        event.preventDefault();
-
-        //Additon of the openCommentModal function which toggles the modal state is to ensure that the
-        //modal closes after submission
-        this.openCommentModal();
-    }
+    
+    
 
 
     render() {
-        //The validate function would be invoked in the render because everytime there is a change in
-        //the input field, the form will be rerendered; Hence, that would be an appropriate time to carry
-        //out the check
-        const errors = this.validate(this.state.username);
-
-
-
+        
         //this helped when I couldn't get "let dish = this.props" to render dish object 
         // in the return statement. Then, dish.name returned undefined in the console
-        console.log('new props in dishdetail', this.props);
         let props = this.props;
         let dish = props.dish || {};
-        const { openModal } = this.state;
         // let comment = props.comments || {};
 
         console.log('props in DishDetail', props)
@@ -216,63 +245,16 @@ class DishDetail extends Component {
                         <br />
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
                             <RenderDish dish={dish} />
-                                <RenderComments openCommentModal={this.openCommentModal} props={props} />
+                            <RenderComments  comments={props.comments}
+                                addComment={props.addComment} dishId={props.dish.id}
+                            />
                         </div>
                     </div>
                     : ''
             
                 }
 
-                {
-                    this.state.openModal === true ? 
-                        <Modal open={openModal} onClose={this.openCommentModal} center>
-                            <FormForm onSubmit={this.handleSubmit}>
-                                <ModalHeader>Submit Comment</ModalHeader>
-                                <ModalBody style={{width: '400px'}}>
-                                    <ModalRow>
-                                        <i style={FormLabel}>Rating</i>
-                                        <select type="select" name="rating" value={this.state.rating}
-                                            onChange={this.handleInputChange} style={FormInput}>
-                                            <option>1</option>
-                                            <option>2</option>
-                                            <option>3</option>
-                                            <option>4</option>
-                                            <option>5</option>
-                                        </select>
-                                    </ModalRow>
-                                    <ModalRow>
-                                        <i style={FormLabel}>Your Name</i>
-                                        <input type="text" id="username" name="username"
-                                            placeholder="Username"
-                                            style={FormInput}
-                                            onChange={this.handleInputChange}
-                                            onBlur={this.handleBlur('username')}
-                                            //Valid and Invalid here is used to set valid flag so that
-                                            //if the field is not valid, the corresponding error will
-                                            //be set appropriately 
-                                            valid={errors.username === ''}
-                                            invalid={errors.username !== ''}
-                                        />
-                                        <div style={FormFeedback}>{errors.username}</div>
-                                    </ModalRow>
-
-                                    <ModalRow>
-                                        <i style={FormLabel}>Comment</i>
-                                        <textarea type="textarea" id="comment" name="comment"
-                                            placeholder="Comment" value={this.state.comment}
-                                            onChange={this.handleInputChange} style={{minHeight: '140px'}} />
-                                    </ModalRow>
-
-                                    
-
-                                    
-
-                                    <button style={ButtonStyle} type="submit" value="submit">Submit</button>
-                                </ModalBody>
-                            </FormForm>
-                        </Modal>
-                        : ''
-                }
+                
             </div>
         );
 

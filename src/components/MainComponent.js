@@ -14,6 +14,7 @@ import { Switch, Route, Redirect, withRouter } from 'react-router-dom';
 import Header from './HeaderComponent';
 import { connect } from 'react-redux';
 import Footer from './FooterComponent';
+import { addComment } from '../redux/ActionCreators';
 
 //Before the introduction of redux, the state was managed from the mainComponent here.
 //DISHES, COMMENTS, PROMOTIONS, LEADERS were imported from their respective locations, initialized in 
@@ -33,6 +34,18 @@ const mapStateToProps = state => {
         leaders: state.leaders
     };
 }
+
+//This dispatch function is responsible for the update to the state that was originally introduced 
+//by the mapStateToProps function. This mapDispatchToProps function is also added to connect at the 
+//bottom of this file to make it available to the MainComponent
+const mapDispatchToProps = (dispatch) => ({
+    //addComment action function below takes in the parameters to be updated and dispatch dispatches an update 
+    //of the corresponding parameters. This function will be passed in as an attribute to DishDetail
+    addComment: (dishId, rating, author, comment) => dispatch(addComment(dishId, rating, author, comment))
+})
+
+
+
 
 class Main extends Component {
     constructor(props) {
@@ -93,7 +106,8 @@ class Main extends Component {
             console.log('paramsparamsparams=====', match);
             return (
                 <DishDetail dish={this.props.dishes.filter((dish) => dish.id === parseInt(match.params.dishId,10))[0]} 
-                    comments={this.props.comments.filter((comment) => comment.dishId === parseInt(match.params.dishId,10))}    
+                    comments={this.props.comments.filter((comment) => comment.dishId === parseInt(match.params.dishId,10))}
+                    addComment={this.props.addComment}  
                 />
             );
         }
@@ -142,7 +156,7 @@ class Main extends Component {
     }
 }
 
-export default withRouter(connect(mapStateToProps)(Main));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Main));
 
 //array notation [0] is used above to denote the first occurence of dish.id == selectedDish;
 //Although, there's only one occurence of it from d filter fxn, it helps ensure there are no errors
