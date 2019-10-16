@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Loading } from './LoadingComponent';
 
 
 const CardContainer = {
@@ -61,24 +62,35 @@ const HomeTop = {
 
 
 
-const Card = ({item}) => {
-    return (
-        <div style={CardMain}>
-            <div style={CardImageContainer}>
-                <img style={CardImage} src={item.image} alt={item.name} />
-            </div>
-            <div style={CardBody}>
-                <h2 style={CardHeading}>{item.name}</h2>
-                {
-                    //Here, JSX is used to verify if item.designation exists. If it does, then the 
-                    //Card subheading is added as shown below, else null is returned
-                    item.designation ? <h4 style={CardSubHeading}>{item.designation}</h4> : null
-                }
-                <p style={CardDescrption}>{item.description}</p>
-            </div>
+const Card = ({item, isLoading, errMsg}) => {
+    if (isLoading) {
+        return (
+            <Loading />
+        );
+    }
+    else if (errMsg) {
+        return (
+            <h4>{errMsg}</h4>
+        );
+    }
+    else
+        return (
+            <div style={CardMain}>
+                <div style={CardImageContainer}>
+                    <img style={CardImage} src={item.image} alt={item.name} />
+                </div>
+                <div style={CardBody}>
+                    <h2 style={CardHeading}>{item.name}</h2>
+                    {
+                        //Here, JSX is used to verify if item.designation exists. If it does, then the 
+                        //Card subheading is added as shown below, else null is returned
+                        item.designation ? <h4 style={CardSubHeading}>{item.designation}</h4> : null
+                    }
+                    <p style={CardDescrption}>{item.description}</p>
+                </div>
 
-        </div>
-    ); 
+            </div>
+        );
 }
 
 class Home extends Component {
@@ -101,7 +113,7 @@ class Home extends Component {
 
     render() {
         const { dish, promotion, leader } = this.props;
-        
+        let props = this.props;
 
         return (
             <div style={{ padding: '0' }}>
@@ -120,7 +132,10 @@ class Home extends Component {
                     //We have named it item and as such, we are passing item to the Card function component
                 }
                 <div style={CardContainer}>
-                    <Card item={dish} />
+                    <Card item={dish}
+                        isLoading={props.dishesLoading}
+                        errMsg={props.dishesErrMsg}
+                    />
                     <Card item={promotion} />
                     <Card item={leader} />
                 </div>

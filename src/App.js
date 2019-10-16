@@ -20,7 +20,7 @@ class App extends Component {
       
         <div>
           {
-            //Setting store={store} in the Provider makes the store available to the all the 
+            //Setting store={store} in the Provider makes the store available to all the 
             //components within the react application
           }
           <Provider store={store}>

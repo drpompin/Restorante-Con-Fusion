@@ -14,7 +14,7 @@ import { Switch, Route, Redirect, withRouter } from 'react-router-dom';
 import Header from './HeaderComponent';
 import { connect } from 'react-redux';
 import Footer from './FooterComponent';
-import { addComment } from '../redux/ActionCreators';
+import { addComment, fetchDishes } from '../redux/ActionCreators';
 
 //Before the introduction of redux, the state was managed from the mainComponent here.
 //DISHES, COMMENTS, PROMOTIONS, LEADERS were imported from their respective locations, initialized in 
@@ -41,8 +41,12 @@ const mapStateToProps = state => {
 const mapDispatchToProps = (dispatch) => ({
     //addComment action function below takes in the parameters to be updated and dispatch dispatches an update 
     //of the corresponding parameters. This function will be passed in as an attribute to DishDetail
-    addComment: (dishId, rating, author, comment) => dispatch(addComment(dishId, rating, author, comment))
-})
+    addComment: (dishId, rating, author, comment) => dispatch(addComment(dishId, rating, author, comment)),
+    
+    //fetchDishes used here is a Thunk; hence, d reason it can be dispatched
+    fetchDishes: () => {dispatch(fetchDishes())},
+});
+
 
 
 
@@ -66,6 +70,12 @@ class Main extends Component {
     // }
 
     
+    //componentDidMount is the perfect location to invoke the fetch dishes; as the lifecycle method is
+    // is invoked just immediately after the component mounts
+    componentDidMount() {
+        this.props.fetchDishes();
+    }
+
 
 
 
@@ -91,7 +101,9 @@ class Main extends Component {
 
         const HomePage = () => {
             return (
-                <Home dish={this.props.dishes.filter((dish) => dish.featured)[0]}
+                <Home dish={this.props.dishes.dishes.filter((dish) => dish.featured)[0]}
+                    dishesLoading={this.props.dishes.isLoading}
+                    dishesErrMsg={this.props.dishes.ErrMsg}
                     promotion={this.props.promotions.filter((promo) => promo.featured)[0]}
                     leader={this.props.leaders.filter((leader) => leader.featured)[0]}
                 />
@@ -105,7 +117,9 @@ class Main extends Component {
         const DishWithId = ({match}) => {
             console.log('paramsparamsparams=====', match);
             return (
-                <DishDetail dish={this.props.dishes.filter((dish) => dish.id === parseInt(match.params.dishId,10))[0]} 
+                <DishDetail dish={this.props.dishes.dishes.filter((dish) => dish.id === parseInt(match.params.dishId,10))[0]}
+                    isLoading={this.props.dishes.isLoading}
+                    errMsg={this.props.dishes.ErrMsg}
                     comments={this.props.comments.filter((comment) => comment.dishId === parseInt(match.params.dishId,10))}
                     addComment={this.props.addComment}  
                 />
@@ -138,8 +152,8 @@ class Main extends Component {
     
     
     
-                    <Route exact path="/aboutus" component={AboutUsComponent} />}/>
-                    <Route exact path="/contactus" component={Contact} />}/>
+                        <Route exact path="/aboutus" component={AboutUsComponent} />}/>
+                        <Route exact path="/contactus" component={Contact} />}/>
                     {
                             //Redirect here is used to set a default location in the case where a 
                             //route cannot be found or rendered

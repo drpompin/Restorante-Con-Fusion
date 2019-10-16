@@ -4,6 +4,7 @@ import Modal from 'react-responsive-modal';
 import { FormLabel, FormInput, FormFeedback, MessageInput } from './ContactComponent';
 import { ModalHeader, ModalBody, ModalRow, Button } from '../shared/sharedStyles';
 import { Control, LocalForm, Errors } from 'react-redux-form';
+import { Loading } from './LoadingComponent';
 
 
 const leftStyle = {
@@ -210,56 +211,58 @@ class CommentForm extends Component {
 
 
 
-class DishDetail extends Component {
-    
-    
-
-
-    render() {
-        
-        //this helped when I couldn't get "let dish = this.props" to render dish object 
-        // in the return statement. Then, dish.name returned undefined in the console
-        let props = this.props;
-        let dish = props.dish || {};
-        // let comment = props.comments || {};
-
+const DishDetail = (props) =>  {
         console.log('props in DishDetail', props)
 
-        return (
-            <div>
-                {
-                    dish !== null || dish !== undefined ? 
-                
-                    <div style={{ width: '100%', clear: 'both', textAlign: 'center', }}>
-                        <div style={PageTitleStyle}>
-                            <Link style={TitleLink} to={"/menu"}><h3 style={{ margin: '0' }}>Menu</h3></Link>
-                            <h3 style={{ margin: '0', padding: '10px 5px', background: '#f3f0f0', }}>/</h3>
-                            <h3 style={TitleName}>{dish.name}</h3>
-                        </div>
-
-                        <h1 style={{ textAlign: 'left', padding: '0 50px' }}>
-                            {dish.name}
-                            <hr />
-                        </h1>
-
-                        <br />
-                        <div style={{ display: 'flex', flexDirection: 'row' }}>
-                            <RenderDish dish={dish} />
-                            <RenderComments  comments={props.comments}
-                                addComment={props.addComment} dishId={props.dish.id}
-                            />
-                        </div>
-                    </div>
-                    : ''
-            
-                }
-
-                
-            </div>
-        );
-
         
-    }
+        if (props.isLoading) {
+            return (
+                <div style={{ width: '100%' }}>
+                    <div style={{ width: '100%' }}>
+                        <Loading />
+                    </div>
+                </div>
+            );
+        }
+        else if (props.errMsg) {
+            return (
+                <div style={{ width: '100%' }}>
+                    <div style={{ width: '100%' }}>
+                        <h4>{props.errMsg}</h4>
+                    </div>
+                </div>
+            );
+        }
+        else if (props.dish !== null || props.dish !== undefined)
+            return (
+                <div style={{ width: '100%', clear: 'both', textAlign: 'center', }}>
+                    <div style={PageTitleStyle}>
+                        <Link style={TitleLink} to={"/menu"}><h3 style={{ margin: '0' }}>Menu</h3></Link>
+                        <h3 style={{ margin: '0', padding: '10px 5px', background: '#f3f0f0', }}>/</h3>
+                        <h3 style={TitleName}>{props.dish.name}</h3>
+                    </div>
+
+                    <h1 style={{ textAlign: 'left', padding: '0 50px' }}>
+                        {props.dish.name}
+                        <hr />
+                    </h1>
+
+                    <br />
+                    <div style={{ display: 'flex', flexDirection: 'row' }}>
+                        <RenderDish dish={props.dish} />
+                        <RenderComments comments={props.comments}
+                            addComment={props.addComment} dishId={props.dish.id}
+                        />
+                    </div>
+                </div>
+            );
+        else {
+            return (
+                <div></div>
+            );
+        }
+
+   
 }
 
 

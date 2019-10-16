@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Loading } from './LoadingComponent';
 
 
 const row = {
@@ -111,7 +112,7 @@ const Menu = (props) => {
 
     //Instead of using this.props for const menu as shown above, only props is used as props has been passed
     //to the Menu function
-    const menu = props.dishes.map((dish) => {
+    const menu = props.dishes.dishes.map((dish) => {
         return (
             <div key={dish.id} style={spanAll} >
                 {
@@ -132,31 +133,50 @@ const Menu = (props) => {
         );
     });
 
-    return (
-        // <React.Fragment>
-            <div style={{padding: '0 50px'}}>
-                <div style={PageTitleStyle}>
-                    <Link style={TitleLink} to={"/home"}><h3 style={{ margin: '0' }}>Home</h3></Link>
-                    <h3 style={{ margin: '0', padding: '10px 5px', background: '#f3f0f0', }}>/</h3>
-                    <h3 style={TitleName}>Menu</h3>
-                </div>
-                <h1>Menu</h1>
-                <hr />
-                <br />
-
-
-                <div style={row}>
-                    {menu}
+    if (props.dishes.isLoading) {
+        return (
+            <div style={{ width: '100%' }}>
+                <div style={{ width: '100%' }}>
+                    <Loading />
                 </div>
             </div>
+        );
+    }
+    else if (props.dishes.errMsg) {
+        return (
+            <div style={{ width: '100%' }}>
+                <div style={{ width: '100%' }}>
+                    <h4>{props.dishes.errMsg}</h4>
+                </div>
+            </div>
+        );
+    }
+    else
+        return (
+            // <React.Fragment>
+                <div style={{padding: '0 50px'}}>
+                    <div style={PageTitleStyle}>
+                        <Link style={TitleLink} to={"/home"}><h3 style={{ margin: '0' }}>Home</h3></Link>
+                        <h3 style={{ margin: '0', padding: '10px 5px', background: '#f3f0f0', }}>/</h3>
+                        <h3 style={TitleName}>Menu</h3>
+                    </div>
+                    <h1>Menu</h1>
+                    <hr />
+                    <br />
 
-            
-                //<DishDetail dish={this.state.selectedDish} />
-                //dish is passed to the DishDetail component here as seen above; its a parent to child to grandchild passing of props flow
-                //i.e. the dishes data originally came from App/Main component, to the Menu component and now to d DishDetail component
-            
-        /* </React.Fragment> */
-    );
+
+                    <div style={row}>
+                        {menu}
+                    </div>
+                </div>
+
+                
+                    //<DishDetail dish={this.state.selectedDish} />
+                    //dish is passed to the DishDetail component here as seen above; its a parent to child to grandchild passing of props flow
+                    //i.e. the dishes data originally came from App/Main component, to the Menu component and now to d DishDetail component
+                
+            /* </React.Fragment> */
+        );
 }
 
 export default Menu;
